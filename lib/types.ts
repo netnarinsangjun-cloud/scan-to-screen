@@ -17,6 +17,16 @@ export type TvState = {
   updated_at: string | null;
 };
 
+/** Fields an admin edits in the back office (id / created_at are server-managed). */
+export type ProductInput = {
+  barcode_id: string;
+  title: string;
+  description: string | null;
+  price: number | null;
+  image_url: string | null;
+  video_url: string | null;
+};
+
 /** Realtime channel health, surfaced on the standby screen and scanner header. */
 export type RealtimeStatus = "connecting" | "live" | "reconnecting";
 
@@ -72,7 +82,9 @@ export type Database = {
       };
     };
     Views: { [_ in never]: never };
-    Functions: { [_ in never]: never };
+    Functions: {
+      is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
+    };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };
   };

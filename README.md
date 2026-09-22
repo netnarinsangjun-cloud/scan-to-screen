@@ -3,6 +3,7 @@
 ระบบแสดงสินค้าบนจอทีวีสำหรับบูธงานอีเวนต์ เมื่อทีมงานสแกนบาร์โค้ดหรือ QR ของสินค้า จอทีวีจะแสดงสินค้านั้นทันทีพร้อมแอนิเมชัน แล้วกลับสู่หน้ารอสแกนเองหลังผ่านไป 30 วินาที
 
 - **`/tv`** คือหน้าจอทีวีขนาด 1920×1080 รับการสแกนจากเครื่องสแกน USB และรอรับข้อมูลจาก Supabase Realtime
+- **`/admin`** คือหน้าหลังบ้านสำหรับเพิ่มหรือแก้ไขสินค้า (ต้องล็อกอิน)
 - **`/scanner`** คือหน้าสแกนบนมือถือ ใช้กล้องมือถือสแกน (`@zxing/browser`) มีช่องกรอกบาร์โค้ดเอง และปุ่ม "RESET TV"
 
 เทคโนโลยีที่ใช้: Next.js 14 (App Router), TypeScript (strict), Tailwind CSS, Framer Motion, Supabase (Postgres + Realtime) และ Vercel
@@ -37,6 +38,23 @@ npm run build && npm start
    ```
 
 > ⚠️ นโยบาย RLS เปิดกว้างโดยตั้งใจ เพื่อให้บูธใช้งานได้โดยไม่ต้องล็อกอิน ใครก็ตามที่มี anon key จะเปลี่ยนสิ่งที่แสดงบนจอได้ หลังจบงานควรเปลี่ยน (rotate) anon key หรือลบนโยบาย `booth: update tv_state` ออก
+
+## 2.1 หลังบ้าน `/admin` (จัดการสินค้า)
+
+1. รัน [`supabase/admin.sql`](supabase/admin.sql) ใน SQL Editor (หลังจาก `schema.sql`) สคริปต์นี้จะสร้างตารางรายชื่อแอดมิน กฎสิทธิ์ที่ให้เฉพาะแอดมินแก้สินค้าได้ และที่เก็บรูปชื่อ `product-media`
+2. สร้างบัญชีแอดมินที่ **Authentication → Users → Add user → Create new user**
+   - Email: `admin@scan-to-screen.local` (ระบบแปลงชื่อผู้ใช้ `admin` เป็นอีเมลนี้ให้เอง และไม่มีอีเมลส่งออกไป)
+   - Password: ตั้งเอง
+   - ติ๊ก **Auto Confirm User**
+3. เข้า `/admin` แล้วล็อกอินด้วยชื่อผู้ใช้ `admin` กับรหัสผ่านที่ตั้งไว้
+
+**ความสามารถของหน้าหลังบ้าน:** เพิ่ม แก้ไข ลบ และค้นหาสินค้า อัปโหลดรูปจากเครื่องหรือมือถือ (ระบบย่อรูปให้อัตโนมัติ) อัปโหลดวิดีโอ ใส่บาร์โค้ดด้วยเครื่องสแกน USB หรือกล้อง นำเข้าและส่งออกไฟล์ CSV ส่งสินค้าขึ้นจอ และพิมพ์ QR ที่ `/admin/qr` เมื่อแก้สินค้า จอทีวีจะโหลดรายการใหม่ทันที
+
+**เพิ่มแอดมินคนอื่น:** สร้างบัญชีใหม่ใน Authentication เช่น `staff2@scan-to-screen.local` แล้วรันคำสั่งนี้
+
+```sql
+insert into public.admins (email) values ('staff2@scan-to-screen.local');
+```
 
 ## 3. Deploy ขึ้น Vercel
 
@@ -144,12 +162,16 @@ app/
   layout.tsx            ฟอนต์ (Orbitron / Rajdhani / IBM Plex Sans Thai) และเลเยอร์เส้นสแกนทั้งจอ
   globals.css           ยูทิลิตี้ของธีม: ตัวอักษรเรืองแสง, แผง HUD, เอฟเฟกต์ glitch, เส้นสแกน
   page.tsx              หน้าเลือกเปิด /tv หรือ /scanner
+  admin/page.tsx        หลังบ้าน: ล็อกอิน, จัดการสินค้า, นำเข้า/ส่งออก CSV
+  admin/qr/page.tsx     แผ่นพิมพ์ QR ของสินค้าทุกชิ้น
   tv/page.tsx           ลำดับสถานะของทีวี: standby → transition → product | not_found
   scanner/page.tsx      หน้าสแกนบนมือถือ
 components/tv/          StandbyScreen, ScanTransition, ProductScreen, NotFoundScreen,
                         CountdownRing, ParticleField, TvCanvas (ย่อขยายแคนวาส 1920×1080)
 components/scanner/     Toasts (ข้อความแจ้งเตือน)
+components/admin/       ProductEditor, ImportDialog, LoginPanel, BarcodeScanModal, Modal, ConfirmDialog
 hooks/                  useBarcodeScanner, useTvState, useQrScanner, useWakeLock
 lib/                    Supabase client และคำสั่งดึงข้อมูล, types, config, ตัวจัดรูปแบบ, เสียง/การสั่น
 supabase/schema.sql     schema, Realtime, RLS, ข้อมูลตัวอย่าง
+supabase/admin.sql      ตารางแอดมิน, สิทธิ์แก้ไขสินค้า, ที่เก็บรูป
 ```

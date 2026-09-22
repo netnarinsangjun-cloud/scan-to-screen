@@ -55,6 +55,8 @@ export default function TvPage() {
     }
   }, []);
 
+  const reloadCatalogRef = useRef<() => void>(() => undefined);
+
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
@@ -70,6 +72,7 @@ export default function TvPage() {
         console.warn("[tv] product load failed", err);
       }
     };
+    reloadCatalogRef.current = () => void load();
     void load();
     const id = setInterval(() => void load(), PRODUCT_REFRESH_MS);
     return () => {
@@ -176,7 +179,8 @@ export default function TvPage() {
     [handleCode],
   );
 
-  const { realtime, pollOk, markSeen } = useTvState({ onRow, onNotFound: showNotFound });
+  const onCatalogChanged = useCallback(() => reloadCatalogRef.current(), []);
+  const { realtime, pollOk, markSeen } = useTvState({ onRow, onNotFound: showNotFound, onCatalogChanged });
   markSeenRef.current = markSeen;
 
   useBarcodeScanner({ onScan: (code) => void handleCode(code, "usb") });

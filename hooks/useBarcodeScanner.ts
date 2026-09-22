@@ -47,6 +47,9 @@ export function useBarcodeScanner({ onScan, maxGapMs = 50, minLength = 3, enable
       // Modifier chords (Ctrl+R, Cmd+Q, Alt+Tab…) are never scanner input.
       if (event.ctrlKey || event.metaKey || event.altKey) return;
       if (event.isComposing) return;
+      // Typing into a form field (e.g. /admin) is never intercepted; the field receives the scan.
+      const target = event.target as HTMLElement | null;
+      if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
 
       const now = performance.now();
       const gap = now - lastKeyAt;

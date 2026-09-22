@@ -1,8 +1,8 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { TV_STATE_ID } from "./config";
-import type { Database, Product, TvState } from "./types";
+import type { Database, Product, ProductInput, TvState } from "./types";
 
-export type { Database, Product, TvState } from "./types";
+export type { Database, Product, ProductInput, TvState } from "./types";
 
 export type BoothClient = SupabaseClient<Database>;
 
@@ -25,7 +25,9 @@ export function getSupabase(): BoothClient {
   }
 
   client = createClient<Database>(url, anonKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
+    // Sessions only exist for /admin (magic-link sign-in). /tv and /scanner stay
+    // anonymous, so no refresh timers run on the kiosk.
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
     realtime: {
       params: { eventsPerSecond: 20 },
       // Short heartbeat so a dead socket is detected quickly on booth Wi-Fi.
@@ -101,4 +103,53 @@ export async function resetTv(
   const { data, error } = await query.select(TV_COLUMNS).maybeSingle();
   if (error) throw error;
   return data;
+}
+
+// ---------------------------------------------------------------------------
+// Admin back office
+// ---------------------------------------------------------------------------
+
+export const MEDIA_BUCKET = "product-media";
+
+export async function checkIsAdmin(): Promise<boolean> {
+  const { data, error } = await getSupabase().rpc("is_admin");
+  if (error) throw error;
+  return data === true;
+}
+
+export async function saveProduct(input: ProductInput, id?: string): Promise<Product> {
+  const query = id
+    ? getSupabase().from("products").update(input).eq("id", id)
+    : getSupabase().from("products").insert(input);
+  const { data, error } = await query.select(PRODUCT_COLUMNS).single();
+  if (error) throw error;
+  return normaliseProduct(data);
+}
+
+export async function deleteProduct(id: string): Promise<void> {
+  const { error } = await getSupabase().from("products").delete().eq("id", id);
+  if (error) throw error;
+}
+
+/** Insert-or-update many products by barcode (CSV import). */
+export async function upsertProducts(rows: ProductInput[]): Promise<number> {
+  const { data, error } = await getSupabase()
+    .from("products")
+    .upsert(rows, { onConflict: "barcode_id" })
+    .select("id");
+  if (error) throw error;
+  return data?.length ?? 0;
+}
+
+/** Upload an image/video to the public media bucket and return its public URL. */
+export async function uploadMedia(file: Blob, extension: string): Promise<string> {
+  const path = `products/${crypto.randomUUID()}.${extension}`;
+  const storage = getSupabase().storage.from(MEDIA_BUCKET);
+  const { error } = await storage.upload(path, file, {
+    cacheControl: "31536000", // file names are unique, so cache forever
+    contentType: file.type || undefined,
+    upsert: false,
+  });
+  if (error) throw error;
+  return storage.getPublicUrl(path).data.publicUrl;
 }

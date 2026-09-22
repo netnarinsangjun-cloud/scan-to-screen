@@ -129,6 +129,24 @@
   }
 }
 
+/* QR sheet: light page, no HUD overlay, nothing but the cards on paper. */
+body:has(.qr-sheet) {
+  background: #fff;
+}
+body:has(.qr-sheet) .hud-overlay {
+  display: none;
+}
+@media print {
+  .no-print,
+  .hud-overlay {
+    display: none !important;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hud-overlay::after {
     animation: none;

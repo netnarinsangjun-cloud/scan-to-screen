@@ -2,7 +2,7 @@
 
 import type { RealtimeChannel, RealtimePostgresUpdatePayload } from "@supabase/supabase-js";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { NOT_FOUND_EVENT, POLL_INTERVAL_MS, REALTIME_CHANNEL, TV_STATE_ID } from "@/lib/config";
+import { CATALOG_CHANGED_EVENT, NOT_FOUND_EVENT, POLL_INTERVAL_MS, REALTIME_CHANNEL, TV_STATE_ID } from "@/lib/config";
 import { toMs } from "@/lib/format";
 import { fetchTvState, getSupabase } from "@/lib/supabase";
 import type { RealtimeStatus, TvState } from "@/lib/types";
@@ -18,6 +18,8 @@ interface Options {
   onRow?: (row: TvState, source: RowSource) => void;
   /** Fired when a phone broadcasts an unknown barcode. */
   onNotFound?: (code: string) => void;
+  /** Fired when /admin reports the product catalogue changed. */
+  onCatalogChanged?: () => void;
   pollMs?: number;
 }
 
@@ -30,6 +32,8 @@ interface Result {
   markSeen: (row: TvState) => void;
   /** Tell the TV a phone scanned an unknown barcode. */
   broadcastNotFound: (code: string) => Promise<void>;
+  /** Tell every TV to reload the product catalogue now. */
+  broadcastCatalogChanged: () => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -49,7 +53,7 @@ function remember(seen: string[], key: string): void {
  *    event missed while the socket was silently dead)
  *  - immediate catch-up fetch on (re)subscribe, `online` and tab-visible
  */
-export function useTvState({ onRow, onNotFound, pollMs = POLL_INTERVAL_MS }: Options = {}): Result {
+export function useTvState({ onRow, onNotFound, onCatalogChanged, pollMs = POLL_INTERVAL_MS }: Options = {}): Result {
   const [row, setRow] = useState<TvState | null>(null);
   const [realtime, setRealtime] = useState<RealtimeStatus>("connecting");
   const [pollOk, setPollOk] = useState(true);
@@ -58,6 +62,8 @@ export function useTvState({ onRow, onNotFound, pollMs = POLL_INTERVAL_MS }: Opt
   const onNotFoundRef = useRef(onNotFound);
   onRowRef.current = onRow;
   onNotFoundRef.current = onNotFound;
+  const onCatalogChangedRef = useRef(onCatalogChanged);
+  onCatalogChangedRef.current = onCatalogChanged;
 
   // Recently seen row keys. A stale poll response (issued before a Realtime
   // event, answered after it) carries an already-seen key and is ignored.
@@ -145,6 +151,9 @@ export function useTvState({ onRow, onNotFound, pollMs = POLL_INTERVAL_MS }: Opt
         .on("broadcast", { event: NOT_FOUND_EVENT }, (message: { payload?: { code?: unknown } }) => {
           const code = message.payload?.code;
           if (typeof code === "string" && code) onNotFoundRef.current?.(code);
+        })
+        .on("broadcast", { event: CATALOG_CHANGED_EVENT }, () => {
+          onCatalogChangedRef.current?.();
         });
 
       channelRef.current = channel;
@@ -205,15 +214,18 @@ export function useTvState({ onRow, onNotFound, pollMs = POLL_INTERVAL_MS }: Opt
     };
   }, [pollMs, refresh]);
 
-  const broadcastNotFound = useCallback(async (code: string) => {
+  const broadcast = useCallback(async (event: string, payload: Record<string, unknown>) => {
     const channel = channelRef.current;
     if (!channel) return;
     try {
-      await channel.send({ type: "broadcast", event: NOT_FOUND_EVENT, payload: { code } });
+      await channel.send({ type: "broadcast", event, payload });
     } catch (err) {
       console.warn("[tv_state] broadcast failed", err);
     }
   }, []);
 
-  return { row, realtime, pollOk, markSeen, broadcastNotFound, refresh };
+  const broadcastNotFound = useCallback((code: string) => broadcast(NOT_FOUND_EVENT, { code }), [broadcast]);
+  const broadcastCatalogChanged = useCallback(() => broadcast(CATALOG_CHANGED_EVENT, {}), [broadcast]);
+
+  return { row, realtime, pollOk, markSeen, broadcastNotFound, broadcastCatalogChanged, refresh };
 }
