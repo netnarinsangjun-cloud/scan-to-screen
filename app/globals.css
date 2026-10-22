@@ -4,15 +4,12 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
-    --crimson: #dc143c;
-    --scarlet: #ff2400;
-    --void: #050505;
+    color-scheme: light;
   }
 
   html,
   body {
-    @apply bg-void text-graphite-50 antialiased;
+    @apply bg-void text-ink antialiased;
     height: 100%;
   }
 
@@ -22,11 +19,11 @@
   }
 
   ::selection {
-    background: rgba(220, 20, 60, 0.45);
+    background: rgba(204, 18, 42, 0.85);
     color: #fff;
   }
 
-  /* Hide scrollbars everywhere (content still scrolls on /scanner). */
+  /* Hide scrollbars everywhere (content still scrolls on /scanner and /admin). */
   * {
     scrollbar-width: none;
   }
@@ -36,22 +33,6 @@
 }
 
 @layer components {
-  /* ---- Global HUD overlay: static scan-lines + a slow sweeping band ---- */
-  .hud-overlay {
-    @apply pointer-events-none fixed inset-0 z-[100] overflow-hidden;
-  }
-  .hud-overlay::before {
-    content: "";
-    @apply absolute inset-0 bg-scanlines;
-    opacity: 0.55;
-  }
-  .hud-overlay::after {
-    content: "";
-    @apply absolute inset-x-0 top-0 h-40 animate-scan-sweep;
-    background: linear-gradient(to bottom, transparent, rgba(220, 20, 60, 0.05), transparent);
-    will-change: transform;
-  }
-
   /* ---- TV kiosk root: no cursor, no scroll, no selection ---- */
   .tv-root,
   .tv-root * {
@@ -60,96 +41,59 @@
     -webkit-user-select: none;
   }
   .tv-root {
-    @apply fixed inset-0 overflow-hidden bg-black;
+    @apply fixed inset-0 overflow-hidden bg-gold-50;
     overscroll-behavior: none;
   }
 
-  /* ---- Neon text ---- */
-  .neon-text {
-    color: #fff5f6;
-    text-shadow:
-      0 0 4px rgba(255, 36, 0, 0.9),
-      0 0 14px rgba(220, 20, 60, 0.85),
-      0 0 38px rgba(220, 20, 60, 0.55);
+  /* ---- Ribbon-red headline text (light top, deep bottom, like the "120" artwork) ---- */
+  .brand-text {
+    @apply bg-brand-text bg-clip-text text-transparent;
+    /* A parent's text-shadow would show through the transparent glyphs and wash them out. */
+    text-shadow: none;
+    /* drop-shadow (not text-shadow): text-shadow would show through transparent glyphs */
+    filter: drop-shadow(0 8px 18px rgba(150, 0, 24, 0.18));
   }
-  .neon-text-soft {
-    text-shadow:
-      0 0 6px rgba(220, 20, 60, 0.6),
-      0 0 22px rgba(220, 20, 60, 0.3);
+  .title-shadow {
+    text-shadow: 0 2px 18px rgba(255, 255, 255, 0.9);
   }
 
-  /* ---- Angled HUD panel ---- */
-  .hud-panel {
-    @apply relative border border-crimson-500/40 bg-graphite-900/70 shadow-glow-inset;
-    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+  /* ---- Soft white card ---- */
+  .card-panel {
+    @apply relative rounded-2xl border border-graphite-600 bg-graphite-900/90 shadow-glow-inset;
   }
 
   /* ---- Corner brackets (use on a relative parent) ---- */
   .hud-corners::before,
   .hud-corners::after {
     content: "";
-    @apply pointer-events-none absolute h-10 w-10 border-scarlet-500;
-    filter: drop-shadow(0 0 6px rgba(255, 36, 0, 0.8));
+    @apply pointer-events-none absolute h-10 w-10 border-crimson-500;
   }
   .hud-corners::before {
-    @apply left-0 top-0 border-l-2 border-t-2;
+    @apply left-0 top-0 rounded-tl-xl border-l-[3px] border-t-[3px];
   }
   .hud-corners::after {
-    @apply bottom-0 right-0 border-b-2 border-r-2;
+    @apply bottom-0 right-0 rounded-br-xl border-b-[3px] border-r-[3px];
   }
 
-  /* ---- Glitch text: set data-text to the same string as the content ---- */
-  .glitch {
-    @apply relative inline-block;
-  }
-  .glitch::before,
-  .glitch::after {
-    content: attr(data-text);
-    @apply pointer-events-none absolute inset-0;
-  }
-  .glitch::before {
-    @apply animate-glitch-a;
-    color: var(--scarlet);
-    text-shadow: -3px 0 rgba(255, 36, 0, 0.9);
-  }
-  .glitch::after {
-    @apply animate-glitch-b;
-    color: #fff;
-    text-shadow: 3px 0 rgba(220, 20, 60, 0.9);
-    opacity: 0.8;
-  }
-
-  /* ---- Primary / ghost buttons for /scanner ---- */
+  /* ---- Buttons ---- */
   .btn-primary {
-    @apply flex h-14 items-center justify-center gap-2 bg-crimson-500 px-6 font-hud text-lg font-bold uppercase tracking-[0.2em] text-white shadow-glow transition active:scale-[0.98] active:bg-scarlet-500 disabled:opacity-40;
-    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+    @apply flex h-14 items-center justify-center gap-2 rounded-full bg-ribbon-red px-6 text-lg font-semibold tracking-wide text-white shadow-glow transition hover:brightness-105 active:scale-[0.98] disabled:opacity-40 disabled:shadow-none;
   }
   .btn-ghost {
-    @apply flex h-14 items-center justify-center gap-2 border border-crimson-500/70 bg-transparent px-6 font-hud text-lg font-bold uppercase tracking-[0.2em] text-crimson-200 transition active:scale-[0.98] active:bg-crimson-500/20 disabled:opacity-40;
+    @apply flex h-14 items-center justify-center gap-2 rounded-full border border-crimson-500/70 bg-white px-6 text-lg font-semibold tracking-wide text-crimson-600 transition hover:bg-crimson-50 active:scale-[0.98] disabled:opacity-40;
   }
 }
 
-/* QR sheet: light page, no HUD overlay, nothing but the cards on paper. */
+/* QR sheet: plain white paper. */
 body:has(.qr-sheet) {
   background: #fff;
 }
-body:has(.qr-sheet) .hud-overlay {
-  display: none;
-}
 @media print {
-  .no-print,
-  .hud-overlay {
+  .no-print {
     display: none !important;
   }
   html,
   body {
     background: #fff !important;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hud-overlay::after {
-    animation: none;
-    display: none;
   }
 }

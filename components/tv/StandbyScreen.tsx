@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { BOOTH_LABEL } from "@/lib/config";
 import type { RealtimeStatus } from "@/lib/types";
 import { ParticleField } from "./ParticleField";
+import { SunriseBackdrop } from "./SunriseBackdrop";
 
 interface Props {
   realtime: RealtimeStatus;
@@ -13,35 +14,35 @@ interface Props {
 }
 
 // Screen-level fade. A slightly longer exit than enter keeps the standby
-// visible underneath the scan wipe, so the cut never flashes empty black.
+// visible underneath the scan wipe, so the cut never flashes an empty frame.
 const screenVariants: Variants = {
   initial: { opacity: 0 },
   animate: { opacity: 1, transition: { duration: 0.6, ease: "easeOut" } },
-  exit: { opacity: 0, scale: 1.04, transition: { duration: 0.35, ease: [0.4, 0, 1, 1] } },
+  exit: { opacity: 0, scale: 1.03, transition: { duration: 0.35, ease: [0.4, 0, 1, 1] } },
 };
 
 function StatusIndicator({ realtime, pollOk }: Omit<Props, "productCount">) {
-  const { label, dot, text } =
+  const { label, dot } =
     realtime === "live"
-      ? { label: "SYSTEM READY", dot: "bg-crimson-500 shadow-glow-sm", text: "text-graphite-50" }
+      ? { label: "SYSTEM READY", dot: "bg-crimson-500" }
       : pollOk
         ? realtime === "connecting"
-          ? { label: "SYSTEM BOOTING · LINKING", dot: "bg-amber-400", text: "text-amber-200" }
-          : { label: "SYSTEM READY · FALLBACK SYNC", dot: "bg-amber-400", text: "text-amber-200" }
-        : { label: "OFFLINE · LOCAL SCANNER ONLY", dot: "bg-graphite-400", text: "text-graphite-300" };
+          ? { label: "CONNECTING…", dot: "bg-gold-400" }
+          : { label: "SYSTEM READY · BACKUP SYNC", dot: "bg-gold-400" }
+        : { label: "OFFLINE · LOCAL SCANNER ONLY", dot: "bg-graphite-400" };
 
   return (
-    <div className="flex items-center gap-3 font-hud text-xl font-semibold tracking-[0.3em]">
+    <div className="flex items-center gap-3 rounded-full border border-graphite-600 bg-white/80 px-5 py-2.5 text-lg font-semibold tracking-[0.18em] text-graphite-100 shadow-glow-inset">
       <span className={`h-3 w-3 animate-pulse-dot rounded-full ${dot}`} />
-      <span className={text}>{label}</span>
+      {label}
     </div>
   );
 }
 
 function Clock() {
-  const [now, setNow] = useState<string>("--:--:--");
+  const [now, setNow] = useState<string>("--:--");
   useEffect(() => {
-    const fmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    const fmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit" });
     const tick = () => setNow(fmt.format(new Date()));
     tick();
     const id = setInterval(tick, 1000);
@@ -50,74 +51,97 @@ function Clock() {
   return <span className="tabular-nums">{now}</span>;
 }
 
-/** Wireframe "reactor core": rings + cube built from CSS 3D transforms (no WebGL). */
-function CoreShape() {
-  const faces = [
-    "rotateY(0deg)",
-    "rotateY(90deg)",
-    "rotateY(180deg)",
-    "rotateY(-90deg)",
-    "rotateX(90deg)",
-    "rotateX(-90deg)",
-  ];
-  const cube = 200;
+const RING = 460;
+const R = 178;
+const STROKE = 62;
 
+/**
+ * Ribbon ring with a sunrise inside — a 3D-ish abstract shape built from an
+ * SVG ring + CSS 3D transforms (no WebGL). Inspired by the "0" of the artwork.
+ */
+function RibbonRing() {
+  const c = RING / 2;
   return (
-    <div className="absolute left-1/2 top-[37%] -translate-x-1/2 -translate-y-1/2" style={{ perspective: 1400 }}>
-      <div className="absolute left-1/2 top-1/2 h-[900px] w-[900px] -translate-x-1/2 -translate-y-1/2 bg-red-radial opacity-70" />
-      {/* Outer: slow wobble on X. Separate element from the Y spin so the two
-          loops have independent periods and the motion never visibly repeats. */}
+    <div className="absolute left-1/2 top-[330px] -translate-x-1/2 -translate-y-1/2" style={{ perspective: 1600 }}>
+      {/* Gentle 3D sway: rotateY ±16° on a slow sine. Never a full spin, so the
+          ribbon always reads as a ring rather than a flipping coin. */}
       <motion.div
-        style={{ transformStyle: "preserve-3d" }}
-        animate={{ rotateX: [18, -14, 18] }}
-        transition={{ duration: 17, repeat: Infinity, ease: "easeInOut" }}
+        className="relative"
+        style={{ width: RING, height: RING, transformStyle: "preserve-3d" }}
+        animate={{ rotateY: [-16, 16, -16], rotateX: [6, -4, 6] }}
+        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
       >
-        {/* Inner: continuous Y spin — linear so the rotation speed is constant (no "hitch" at loop point). */}
-        <motion.div
-          className="relative h-[460px] w-[460px]"
-          style={{ transformStyle: "preserve-3d" }}
-          animate={{ rotateY: 360 }}
-          transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
-        >
-          {[0, 60, 120].map((deg) => (
-            <div
-              key={deg}
-              className="absolute inset-0 rounded-full border-2 border-crimson-500/60"
-              style={{
-                transform: `rotateY(${deg}deg)`,
-                boxShadow: "0 0 24px rgba(220,20,60,.35), inset 0 0 24px rgba(220,20,60,.25)",
-              }}
-            />
-          ))}
-          <div
-            className="absolute inset-[40px] rounded-full border border-dashed border-scarlet-500/50"
-            style={{ transform: "rotateX(90deg)" }}
+        {/* Golden orbit, tilted into the scene and spinning in its own plane */}
+        <div className="absolute inset-[-70px]" style={{ transform: "rotateX(74deg)", transformStyle: "preserve-3d" }}>
+          <motion.div
+            className="h-full w-full rounded-full border-[3px] border-gold-300"
+            style={{ borderTopColor: "transparent", borderLeftColor: "rgba(204,18,42,.55)" }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
           />
-          <div
-            className="absolute left-1/2 top-1/2"
-            style={{
-              width: cube,
-              height: cube,
-              marginLeft: -cube / 2,
-              marginTop: -cube / 2,
-              transformStyle: "preserve-3d",
-              transform: "rotateX(35deg) rotateZ(45deg)",
-            }}
+        </div>
+
+        <svg viewBox={`0 0 ${RING} ${RING}`} className="absolute inset-0 overflow-visible drop-shadow-glow-lg" aria-hidden>
+          <defs>
+            <linearGradient id="ring-red" x1="0.15" y1="0" x2="0.85" y2="1">
+              <stop offset="0" stopColor="#E0293F" />
+              <stop offset="0.45" stopColor="#CC122A" />
+              <stop offset="1" stopColor="#7E0014" />
+            </linearGradient>
+            <radialGradient id="ring-sun" cx="0.62" cy="0.62" r="0.6">
+              <stop offset="0" stopColor="#FFFFFF" />
+              <stop offset="0.25" stopColor="#FFF4D9" />
+              <stop offset="0.7" stopColor="#FCDEB4" />
+              <stop offset="1" stopColor="#F7C88A" />
+            </radialGradient>
+            <clipPath id="ring-inner">
+              <circle cx={c} cy={c} r={R - STROKE / 2 + 2} />
+            </clipPath>
+          </defs>
+
+          {/* Sunrise inside the ring, with a small skyline silhouette */}
+          <g clipPath="url(#ring-inner)">
+            <rect x={0} y={0} width={RING} height={RING} fill="url(#ring-sun)" />
+            <path
+              d={`M60,${c + 70} L120,${c + 70} L128,${c + 10} L134,${c - 30} L140,${c + 10} L148,${c + 70} L190,${c + 70} L196,${c + 30} L202,${c - 5} L208,${c + 30} L214,${c + 70}
+                 L250,${c + 70} L250,${c - 10} L276,${c - 10} L276,${c + 70} L284,${c + 70} L284,${c - 50} L304,${c - 50} L304,${c + 70} L314,${c + 70} L314,${c + 5} L342,${c + 5} L342,${c + 70} L400,${c + 70} L400,${RING} L60,${RING} Z`}
+              fill="#E5707F"
+              opacity={0.55}
+            />
+            <rect x={0} y={c + 70} width={RING} height={RING} fill="#FCE3C4" opacity={0.9} />
+          </g>
+
+          {/* The ribbon ring */}
+          <circle cx={c} cy={c} r={R} fill="none" stroke="url(#ring-red)" strokeWidth={STROKE} />
+
+          {/* Moving shine along the ribbon (rotation of a short highlight arc) */}
+          {/* Framer rotates SVG groups around their own bbox centre = the ring centre. */}
+          <motion.g
+            animate={{ rotate: 360 }}
+            // Linear 7 s loop: a constant, calm sweep — like light catching satin.
+            transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
           >
-            {faces.map((f) => (
-              <div
-                key={f}
-                className="absolute inset-0 border-2 border-scarlet-500/80 bg-crimson-500/[0.06]"
-                style={{
-                  transform: `${f} translateZ(${cube / 2}px)`,
-                  boxShadow: "inset 0 0 30px rgba(255,36,0,.25)",
-                }}
-              />
-            ))}
-          </div>
-        </motion.div>
+            <circle
+              cx={c}
+              cy={c}
+              r={R + STROKE * 0.22}
+              fill="none"
+              stroke="rgba(255,255,255,.55)"
+              strokeWidth={8}
+              strokeLinecap="round"
+              strokeDasharray={`${2 * Math.PI * R * 0.16} ${2 * Math.PI * R}`}
+            />
+          </motion.g>
+
+          {/* Ribbon tail sweeping out to the right */}
+          <path
+            d={`M${c + R * 0.6},${c + R * 0.86} C${c + R * 1.3},${c + R * 0.95} ${c + R * 1.75},${c + R * 0.55} ${c + R * 2.3},${c + R * 0.62}
+               L${c + R * 2.3},${c + R * 0.7} C${c + R * 1.75},${c + R * 0.7} ${c + R * 1.3},${c + R * 1.12} ${c + R * 0.52},${c + R * 1.02} Z`}
+            fill="url(#ring-red)"
+            opacity={0.9}
+          />
+        </svg>
       </motion.div>
-      <div className="absolute left-1/2 top-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full bg-scarlet-500/80 blur-2xl" />
     </div>
   );
 }
@@ -131,68 +155,42 @@ export function StandbyScreen({ realtime, pollOk, productCount }: Props) {
       animate="animate"
       exit="exit"
     >
-      {/* Perspective floor grid, panning toward the viewer */}
-      <div className="absolute inset-x-0 bottom-0 h-[520px] overflow-hidden" style={{ perspective: 600 }}>
-        <div
-          className="absolute -inset-x-[50%] -top-[120px] h-[900px] origin-top"
-          style={{ transform: "rotateX(62deg)" }}
-        >
-          <div className="h-[1200px] w-full animate-grid-pan bg-hud-grid-strong bg-grid-lg opacity-40" />
+      <SunriseBackdrop sunX={1420} sunY={790} horizonFromBottom={230} skylineOpacity={0.85} ribbonHeight={200} />
+      <ParticleField count={36} />
+      <RibbonRing />
+
+      {/* Top bar */}
+      <header className="absolute inset-x-0 top-0 flex items-center justify-between px-20 pt-12">
+        <span className="text-xl font-bold tracking-[0.35em] text-crimson-500">{BOOTH_LABEL}</span>
+        <div className="flex items-center gap-6">
+          <StatusIndicator realtime={realtime} pollOk={pollOk} />
+          <span className="text-xl font-semibold tracking-[0.15em] text-graphite-300">
+            {String(productCount).padStart(3, "0")} ITEMS · <Clock />
+          </span>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-void via-void/40 to-transparent" />
-      </div>
-      <div className="absolute inset-0 bg-hud-grid bg-grid opacity-40" />
-
-      <ParticleField count={44} />
-      <CoreShape />
-      <div className="absolute inset-0 bg-vignette" />
-
-      {/* Top HUD bar */}
-      <header className="absolute inset-x-0 top-0 flex items-center justify-between px-20 pt-14 font-hud text-xl font-semibold tracking-[0.4em] text-graphite-200">
-        <span className="text-crimson-400">{BOOTH_LABEL}</span>
-        <span className="flex items-center gap-8">
-          <span className="text-graphite-400">CATALOGUE {String(productCount).padStart(3, "0")}</span>
-          <Clock />
-        </span>
       </header>
 
       {/* Call to action */}
-      <div className="absolute inset-x-0 bottom-[190px] flex flex-col items-center gap-6 text-center">
-        <motion.span
-          className="font-hud text-2xl font-semibold tracking-[0.6em] text-crimson-400"
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-        >
-          ▼ AWAITING INPUT ▼
-        </motion.span>
+      <div className="absolute inset-x-0 top-[600px] flex flex-col items-center text-center">
+        {/* Soft warm halo behind the headline; its opacity breathes in sync with the text. */}
+        <motion.div
+          className="absolute top-[-90px] h-[340px] w-[1500px] rounded-[50%]"
+          style={{ background: "radial-gradient(ellipse, rgba(255,255,255,.95) 0%, rgba(255,246,232,.75) 45%, transparent 72%)" }}
+          animate={{ opacity: [0.7, 1, 0.7] }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+        />
         <motion.h1
-          className="font-display text-[132px] font-black leading-none tracking-[0.08em] text-white"
-          // "Breathing" neon: glow radius, brightness and size swell together on
-          // an easeInOut sine-like loop. 2.4 s ≈ a calm resting breath, which
-          // feels alive without being distracting over hours of idle time.
-          animate={{
-            opacity: [0.82, 1, 0.82],
-            scale: [1, 1.025, 1],
-            textShadow: [
-              "0 0 6px rgba(255,36,0,.6), 0 0 18px rgba(220,20,60,.45), 0 0 40px rgba(220,20,60,.2)",
-              "0 0 10px rgba(255,36,0,1), 0 0 36px rgba(220,20,60,.9), 0 0 90px rgba(220,20,60,.55)",
-              "0 0 6px rgba(255,36,0,.6), 0 0 18px rgba(220,20,60,.45), 0 0 40px rgba(220,20,60,.2)",
-            ],
-          }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          className="relative text-[124px] font-extrabold leading-none tracking-tight"
+          // Calm "breathing": scale + opacity swell together on an easeInOut loop.
+          // 2.6 s ≈ a resting breath — alive, but not distracting over hours of idle time.
+          animate={{ scale: [1, 1.025, 1], opacity: [0.9, 1, 0.9] }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
         >
-          SCAN PRODUCT NOW
+          <span className="text-ink">SCAN </span>
+          <span className="brand-text">PRODUCT NOW</span>
         </motion.h1>
-        <p className="font-sans text-3xl font-light tracking-wide text-graphite-200">
-          สแกนบาร์โค้ดสินค้าเพื่อดูรายละเอียดบนจอ
-        </p>
+        <p className="relative mt-6 text-[40px] font-medium text-ink-soft">สแกนบาร์โค้ดสินค้าเพื่อดูรายละเอียดบนจอ</p>
       </div>
-
-      {/* Bottom HUD bar */}
-      <footer className="absolute inset-x-0 bottom-0 flex items-center justify-between px-20 pb-14">
-        <StatusIndicator realtime={realtime} pollOk={pollOk} />
-        <span className="font-hud text-lg tracking-[0.4em] text-graphite-400">USB · MOBILE · QR · EAN</span>
-      </footer>
     </motion.section>
   );
 }

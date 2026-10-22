@@ -83,27 +83,27 @@ function Dashboard({ email, onSignOut }: { email: string | null; onSignOut: () =
       <ToastStack toasts={toasts} onDismiss={dismiss} />
 
       {/* Header */}
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-crimson-500/30 pb-5">
+      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-graphite-600 pb-5">
         <div>
           <p className="font-hud text-sm font-semibold tracking-[0.4em] text-crimson-400">BACK OFFICE</p>
-          <h1 className="neon-text font-display text-2xl font-black tracking-wider sm:text-3xl">จัดการสินค้า</h1>
+          <h1 className="brand-text font-display text-2xl font-extrabold tracking-wider sm:text-3xl">จัดการสินค้า</h1>
         </div>
         <div className="flex flex-wrap items-center gap-3 text-sm">
           <span className="flex items-center gap-2 text-graphite-300">
-            <span className={`h-2 w-2 rounded-full ${realtime === "live" ? "bg-crimson-500 shadow-glow-sm" : "bg-amber-400"}`} />
+            <span className={`h-2 w-2 rounded-full ${realtime === "live" ? "bg-crimson-500 shadow-glow-sm" : "bg-gold-400"}`} />
             {emailToUsername(email)}
           </span>
-          <button type="button" className="border border-graphite-500 px-3 py-2 text-graphite-200 hover:border-crimson-500" onClick={() => void onSignOut()}>
+          <button type="button" className="rounded-full border border-graphite-500 bg-white px-4 py-2 text-graphite-200 hover:border-crimson-500" onClick={() => void onSignOut()}>
             ออกจากระบบ
           </button>
         </div>
       </header>
 
       {/* TV status */}
-      <section className="mt-5 flex flex-wrap items-center justify-between gap-3 border border-graphite-600 bg-graphite-900/70 px-4 py-3 text-sm">
+      <section className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-graphite-600 bg-white/90 px-5 py-3 text-sm">
         <span className="text-graphite-300">
           สถานะจอ:{" "}
-          <b className="text-white">
+          <b className="text-ink">
             {onScreen ? `กำลังแสดง · ${products.find((p) => p.barcode_id === onScreen)?.title ?? onScreen}` : "ว่าง (หน้ารอสแกน)"}
           </b>
         </span>
@@ -111,7 +111,7 @@ function Dashboard({ email, onSignOut }: { email: string | null; onSignOut: () =
           {onScreen ? (
             <button
               type="button"
-              className="text-crimson-200 underline"
+              className="text-crimson-600 underline"
               onClick={async () => {
                 const next = await resetTv().catch(() => null);
                 if (next) markSeen(next);
@@ -120,7 +120,7 @@ function Dashboard({ email, onSignOut }: { email: string | null; onSignOut: () =
               รีเซ็ตจอ
             </button>
           ) : null}
-          <Link href="/tv" target="_blank" className="text-crimson-200 underline">
+          <Link href="/tv" target="_blank" className="text-crimson-600 underline">
             เปิดจอทีวี ↗
           </Link>
         </div>
@@ -132,7 +132,7 @@ function Dashboard({ email, onSignOut }: { email: string | null; onSignOut: () =
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="ค้นหาชื่อสินค้า หรือบาร์โค้ด…"
-          className="h-12 flex-1 border border-graphite-500 bg-graphite-800 px-4 text-base text-white outline-none placeholder:text-graphite-500 focus:border-scarlet-500"
+          className="h-12 flex-1 rounded-full border border-graphite-500 bg-white px-5 text-base text-ink outline-none placeholder:text-graphite-500 focus:border-scarlet-500"
         />
         <div className="grid grid-cols-2 gap-3 sm:flex">
           <button type="button" className="btn-primary h-12 px-5 text-sm tracking-[0.1em]" onClick={() => setDialog({ kind: "edit", product: null })}>
@@ -172,14 +172,14 @@ function Dashboard({ email, onSignOut }: { email: string | null; onSignOut: () =
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
-              className={`flex flex-col gap-3 border bg-graphite-900/80 p-3 sm:flex-row sm:items-center ${onScreen === p.barcode_id ? "border-scarlet-500 shadow-glow-sm" : "border-graphite-600"}`}
+              className={`flex flex-col gap-3 rounded-2xl border bg-white/95 p-3 sm:flex-row sm:items-center ${onScreen === p.barcode_id ? "border-scarlet-500 shadow-glow-sm" : "border-graphite-600"}`}
             >
               <div className="flex min-w-0 flex-1 items-center gap-4">
-                <div className="h-16 w-16 shrink-0 overflow-hidden bg-graphite-800">
+                <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-graphite-800">
                   {p.image_url ? <img src={p.image_url} alt="" className="h-full w-full object-cover" loading="lazy" /> : null}
                 </div>
                 <div className="min-w-0">
-                  <p className="truncate font-medium text-white">
+                  <p className="truncate font-medium text-ink">
                     {p.title}
                     {onScreen === p.barcode_id ? <span className="ml-2 text-xs text-scarlet-400">● บนจอ</span> : null}
                   </p>
@@ -187,15 +187,15 @@ function Dashboard({ email, onSignOut }: { email: string | null; onSignOut: () =
                 </div>
               </div>
               <div className="flex items-center justify-between gap-3 sm:justify-end">
-                <span className="font-display text-lg font-bold text-crimson-200 sm:w-32 sm:text-right">{formatBaht(p.price)}</span>
+                <span className="font-display text-lg font-bold text-crimson-600 sm:w-32 sm:text-right">{formatBaht(p.price)}</span>
                 <div className="flex gap-2">
-                  <button type="button" onClick={() => void showOnTv(p)} className="h-10 border border-crimson-500/60 px-3 text-sm text-crimson-200 hover:bg-crimson-500/15">
+                  <button type="button" onClick={() => void showOnTv(p)} className="h-10 rounded-full border border-crimson-500/60 px-3 text-sm text-crimson-600 hover:bg-crimson-500/15">
                     ขึ้นจอ
                   </button>
-                  <button type="button" onClick={() => setDialog({ kind: "edit", product: p })} className="h-10 border border-graphite-500 px-3 text-sm text-graphite-100 hover:border-crimson-500">
+                  <button type="button" onClick={() => setDialog({ kind: "edit", product: p })} className="h-10 rounded-full border border-graphite-500 px-3 text-sm text-graphite-100 hover:border-crimson-500">
                     แก้ไข
                   </button>
-                  <button type="button" onClick={() => setDialog({ kind: "delete", product: p })} className="h-10 border border-graphite-600 px-3 text-sm text-graphite-400 hover:border-scarlet-500 hover:text-scarlet-400">
+                  <button type="button" onClick={() => setDialog({ kind: "delete", product: p })} className="h-10 rounded-full border border-graphite-600 px-3 text-sm text-graphite-400 hover:border-scarlet-500 hover:text-scarlet-400">
                     ลบ
                   </button>
                 </div>
@@ -270,12 +270,12 @@ export default function AdminPage() {
       ) : (
         <div className="flex min-h-dvh items-center justify-center px-4 py-10">
           {status === "loading" ? (
-            <p className="animate-pulse font-hud tracking-[0.3em] text-crimson-200">LOADING…</p>
+            <p className="animate-pulse font-hud tracking-[0.3em] text-crimson-600">LOADING…</p>
           ) : status === "signed_out" ? (
             <LoginPanel onSignIn={signIn} />
           ) : (
-            <div className="hud-panel w-full max-w-md space-y-4 p-8 text-graphite-200">
-              <h1 className="font-display text-2xl font-black text-white">
+            <div className="card-panel w-full max-w-md space-y-4 p-8 text-graphite-200">
+              <h1 className="font-display text-2xl font-extrabold text-ink">
                 {status === "not_admin" ? "ไม่มีสิทธิ์เข้าถึง" : "เกิดข้อผิดพลาด"}
               </h1>
               <p>

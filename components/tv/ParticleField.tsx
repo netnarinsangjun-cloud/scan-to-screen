@@ -43,8 +43,9 @@ export function ParticleField({ count = 44, seed = 1337, className = "" }: Field
           top: `${45 + rand() * 65}%`,
           width: size,
           height: size,
-          background: hot ? "#FF2400" : "#DC143C",
-          boxShadow: `0 0 ${size * 3}px ${hot ? "rgba(255,36,0,.9)" : "rgba(220,20,60,.7)"}`,
+          // Warm light motes: mostly golden, a few ribbon-red.
+          background: hot ? "#CC122A" : "#F0AC5C",
+          boxShadow: `0 0 ${size * 3}px ${hot ? "rgba(204,18,42,.45)" : "rgba(247,200,138,.9)"}`,
           "--p-duration": `${10 + rand() * 16}s`,
           // Negative delays spread particles through their cycle from frame one.
           "--p-delay": `${-rand() * 26}s`,
@@ -101,14 +102,14 @@ export function ParticleBurst({ count = 48, seed = 99, delay = 0.18, originX = 9
       {particles.map((p) => (
         <motion.span
           key={p.id}
-          className="absolute rounded-full bg-scarlet-500"
+          className={`absolute rounded-full ${p.id % 3 === 0 ? "bg-gold-400" : "bg-crimson-500"}`}
           style={{
             left: originX,
             top: originY,
             width: p.long ? p.size * 4 : p.size,
             height: p.size,
             rotate: p.rotate,
-            boxShadow: "0 0 12px rgba(255,36,0,.9)",
+            boxShadow: p.id % 3 === 0 ? "0 0 10px rgba(247,200,138,.9)" : "0 2px 8px rgba(204,18,42,.35)",
           }}
           initial={{ x: 0, y: 0, scale: 1.2, opacity: 1 }}
           animate={{ x: p.x, y: p.y, scale: 0, opacity: 0 }}

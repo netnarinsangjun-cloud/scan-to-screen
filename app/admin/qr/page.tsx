@@ -41,7 +41,7 @@ export default function QrSheetPage() {
           <h1 className="text-2xl font-bold">QR สินค้าทั้งหมด ({cards.length})</h1>
           <p className="text-sm text-neutral-600">สแกนด้วยหน้า /scanner บนมือถือ หรือเครื่องสแกนที่อ่าน QR ได้</p>
         </div>
-        <button type="button" onClick={() => window.print()} className="h-12 bg-[#DC143C] px-6 font-semibold text-white">
+        <button type="button" onClick={() => window.print()} className="h-12 rounded-full bg-crimson-500 px-6 font-semibold text-white">
           พิมพ์ / บันทึกเป็น PDF
         </button>
       </div>
@@ -52,7 +52,7 @@ export default function QrSheetPage() {
             <img src={c.qr} alt={`QR ${c.barcode_id}`} className="h-40 w-40" />
             <p className="mt-2 line-clamp-2 text-sm font-semibold">{c.title}</p>
             <p className="font-mono text-xs tracking-wider text-neutral-600">{c.barcode_id}</p>
-            <p className="text-sm font-bold text-[#DC143C]">{formatBaht(c.price)}</p>
+            <p className="text-sm font-bold text-crimson-500">{formatBaht(c.price)}</p>
           </div>
         ))}
       </div>

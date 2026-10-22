@@ -5,7 +5,7 @@ export default function Home() {
     <main className="relative flex min-h-dvh flex-col items-center justify-center gap-10 bg-void bg-hud-grid bg-grid px-6">
       <div className="text-center">
         <p className="font-hud text-sm tracking-[0.5em] text-crimson-400">EVENT BOOTH SYSTEM</p>
-        <h1 className="neon-text mt-3 font-display text-4xl font-black tracking-widest sm:text-6xl">
+        <h1 className="brand-text mt-3 font-display text-4xl font-extrabold tracking-widest sm:text-6xl">
           SCAN TO SCREEN
         </h1>
       </div>

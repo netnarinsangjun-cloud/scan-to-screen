@@ -17,7 +17,7 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 const VIEWBOX = (RADIUS + STROKE) * 2;
 
 /**
- * Glowing SVG ring that drains from full to empty.
+ * Ribbon-red SVG ring that drains from full to empty.
  * Re-mount it with `key={deadline}` to restart on every scan (even the same code).
  */
 export function CountdownRing({ deadline, durationMs, size = 200 }: Props) {
@@ -41,15 +41,23 @@ export function CountdownRing({ deadline, durationMs, size = 200 }: Props) {
     <div className="relative" style={{ width: size, height: size }}>
       <svg
         viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
-        className="absolute inset-0 h-full w-full -rotate-90 drop-shadow-glow"
+        className="absolute inset-0 h-full w-full -rotate-90"
         aria-hidden
       >
+        <defs>
+          <linearGradient id="countdown-red" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#E0293F" />
+            <stop offset="1" stopColor="#960018" />
+          </linearGradient>
+        </defs>
+        {/* White disc so the ring reads cleanly over any backdrop */}
+        <circle cx={VIEWBOX / 2} cy={VIEWBOX / 2} r={RADIUS + STROKE / 2} fill="#FFFFFF" opacity={0.92} />
         <circle
           cx={VIEWBOX / 2}
           cy={VIEWBOX / 2}
           r={RADIUS}
           fill="none"
-          stroke="rgba(220,20,60,.16)"
+          stroke="#FADDE1"
           strokeWidth={STROKE}
         />
         {/* Tick marks every 1/30th of the ring */}
@@ -58,7 +66,7 @@ export function CountdownRing({ deadline, durationMs, size = 200 }: Props) {
           cy={VIEWBOX / 2}
           r={RADIUS - 16}
           fill="none"
-          stroke="rgba(220,20,60,.35)"
+          stroke="#F1AAB3"
           strokeWidth={6}
           strokeDasharray={`2 ${(2 * Math.PI * (RADIUS - 16)) / 30 - 2}`}
         />
@@ -67,7 +75,7 @@ export function CountdownRing({ deadline, durationMs, size = 200 }: Props) {
           cy={VIEWBOX / 2}
           r={RADIUS}
           fill="none"
-          stroke={urgent ? "#FF2400" : "#DC143C"}
+          stroke={urgent ? "#E3263A" : "url(#countdown-red)"}
           strokeWidth={STROKE}
           strokeLinecap="round"
           strokeDasharray={CIRCUMFERENCE}
@@ -81,7 +89,7 @@ export function CountdownRing({ deadline, durationMs, size = 200 }: Props) {
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <motion.span
           key={seconds <= 5 ? seconds : "steady"}
-          className={`font-display text-6xl font-black tabular-nums ${urgent ? "text-scarlet-400" : "text-white"} neon-text-soft`}
+          className={`text-6xl font-extrabold tabular-nums ${urgent ? "text-scarlet-500" : "text-ink"}`}
           // In the last 5 s each number "punches" in — a quick overshoot scale
           // draws the eye without moving layout.
           initial={urgent ? { scale: 1.35, opacity: 0.4 } : false}
@@ -90,7 +98,7 @@ export function CountdownRing({ deadline, durationMs, size = 200 }: Props) {
         >
           {seconds}
         </motion.span>
-        <span className="font-hud text-sm font-semibold tracking-[0.35em] text-graphite-300">SEC</span>
+        <span className="text-base font-medium text-graphite-300">วินาที</span>
       </div>
     </div>
   );

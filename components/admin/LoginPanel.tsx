@@ -7,7 +7,7 @@ interface Props {
 }
 
 const inputClass =
-  "h-12 w-full border border-graphite-500 bg-graphite-800 px-3 text-base text-white outline-none focus:border-scarlet-500 focus:shadow-glow-sm";
+  "h-12 w-full rounded-xl border border-graphite-500 bg-white px-3 text-base text-ink outline-none focus:border-scarlet-500 focus:shadow-glow-sm";
 
 export function LoginPanel({ onSignIn }: Props) {
   const [username, setUsername] = useState("");
@@ -37,9 +37,9 @@ export function LoginPanel({ onSignIn }: Props) {
   };
 
   return (
-    <div className="hud-panel mx-auto w-full max-w-md p-8">
+    <div className="card-panel mx-auto w-full max-w-md p-8">
       <p className="font-hud text-sm font-semibold tracking-[0.4em] text-crimson-400">BACK OFFICE</p>
-      <h1 className="neon-text mt-2 font-display text-3xl font-black tracking-wider">ADMIN LOGIN</h1>
+      <h1 className="brand-text mt-2 font-display text-3xl font-extrabold tracking-wider">ADMIN LOGIN</h1>
 
       <form onSubmit={submit} className="mt-6 space-y-4">
         <label className="block">

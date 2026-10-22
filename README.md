@@ -159,14 +159,14 @@ google-chrome --kiosk --noerrdialogs --disable-infobars --autoplay-policy=no-use
 
 ```
 app/
-  layout.tsx            ฟอนต์ (Orbitron / Rajdhani / IBM Plex Sans Thai) และเลเยอร์เส้นสแกนทั้งจอ
-  globals.css           ยูทิลิตี้ของธีม: ตัวอักษรเรืองแสง, แผง HUD, เอฟเฟกต์ glitch, เส้นสแกน
+  layout.tsx            ฟอนต์ Noto Sans Thai (ใช้ทั้งภาษาไทยและอังกฤษ)
+  globals.css           ยูทิลิตี้ของธีม Warm Sunrise: ตัวอักษรแดงไล่เฉด, การ์ดขาว, ปุ่ม
   page.tsx              หน้าเลือกเปิด /tv หรือ /scanner
   admin/page.tsx        หลังบ้าน: ล็อกอิน, จัดการสินค้า, นำเข้า/ส่งออก CSV
   admin/qr/page.tsx     แผ่นพิมพ์ QR ของสินค้าทุกชิ้น
   tv/page.tsx           ลำดับสถานะของทีวี: standby → transition → product | not_found
   scanner/page.tsx      หน้าสแกนบนมือถือ
-components/tv/          StandbyScreen, ScanTransition, ProductScreen, NotFoundScreen,
+components/tv/          StandbyScreen, ScanTransition, ProductScreen, NotFoundScreen, SunriseBackdrop,
                         CountdownRing, ParticleField, TvCanvas (ย่อขยายแคนวาส 1920×1080)
 components/scanner/     Toasts (ข้อความแจ้งเตือน)
 components/admin/       ProductEditor, ImportDialog, LoginPanel, BarcodeScanModal, Modal, ConfirmDialog

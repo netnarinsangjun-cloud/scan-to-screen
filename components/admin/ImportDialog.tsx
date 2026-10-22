@@ -89,18 +89,18 @@ export function ImportDialog({ existingBarcodes, onClose, onImported }: Props) {
       <ol className="list-decimal space-y-2 pl-5 text-sm leading-relaxed text-graphite-200">
         <li>
           ดาวน์โหลด{" "}
-          <button type="button" className="text-crimson-200 underline" onClick={() => downloadCsv("products-template.csv", TEMPLATE_ROWS)}>
+          <button type="button" className="text-crimson-600 underline" onClick={() => downloadCsv("products-template.csv", TEMPLATE_ROWS)}>
             ไฟล์ตัวอย่าง
           </button>{" "}
           แล้วเปิดด้วย Excel หรือ Google Sheets
         </li>
         <li>
-          กรอกคอลัมน์ <code className="text-crimson-200">barcode_id, title, description, price, image_url, video_url</code> (สองคอลัมน์แรกบังคับ)
+          กรอกคอลัมน์ <code className="text-crimson-600">barcode_id, title, description, price, image_url, video_url</code> (สองคอลัมน์แรกบังคับ)
         </li>
         <li>บันทึกเป็น <b>CSV UTF-8</b> เพื่อให้ภาษาไทยไม่เพี้ยน แล้วเลือกไฟล์ด้านล่าง</li>
       </ol>
 
-      <label className="mt-5 flex h-28 cursor-pointer flex-col items-center justify-center gap-1 border border-dashed border-crimson-500/60 bg-graphite-800 text-center hover:border-scarlet-500">
+      <label className="mt-5 flex h-28 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-2 border-dashed border-crimson-500/60 bg-graphite-800 text-center hover:border-scarlet-500">
         <span className="text-sm text-graphite-200">{fileName ?? "แตะเพื่อเลือกไฟล์ .csv"}</span>
         {fileName ? <span className="text-xs text-graphite-400">แตะเพื่อเปลี่ยนไฟล์</span> : null}
         <input type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => void readFile(e.target.files?.[0])} />
@@ -109,11 +109,11 @@ export function ImportDialog({ existingBarcodes, onClose, onImported }: Props) {
       {fileName ? (
         <div className="mt-5 space-y-3 text-sm">
           <p className="text-graphite-200">
-            พร้อมนำเข้า <b className="text-white">{rows.length}</b> รายการ — เพิ่มใหม่ {rows.length - updates} · อัปเดตของเดิม{" "}
+            พร้อมนำเข้า <b className="text-ink">{rows.length}</b> รายการ — เพิ่มใหม่ {rows.length - updates} · อัปเดตของเดิม{" "}
             {updates} (จับคู่ด้วยบาร์โค้ด)
           </p>
           {errors.length > 0 ? (
-            <div className="border border-scarlet-500/50 bg-crimson-900/40 p-3">
+            <div className="rounded-xl border border-crimson-200 bg-crimson-50 p-3">
               <p className="mb-1 font-medium text-scarlet-400">ข้ามไป {errors.length} แถว:</p>
               <ul className="list-disc space-y-0.5 pl-5 text-graphite-200">
                 {errors.slice(0, 8).map((e) => (

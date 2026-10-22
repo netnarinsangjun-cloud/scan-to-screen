@@ -132,16 +132,16 @@ export default function ScannerPage() {
   const productList = useMemo(() => Array.from(products.values()), [products]);
 
   const linkDot =
-    realtime === "live" ? "bg-crimson-500 shadow-glow-sm" : pollOk ? "bg-amber-400" : "bg-graphite-400";
+    realtime === "live" ? "bg-crimson-500 shadow-glow-sm" : pollOk ? "bg-gold-400" : "bg-graphite-400";
 
   return (
     <main className="min-h-dvh bg-void bg-hud-grid bg-grid pb-[max(24px,env(safe-area-inset-bottom))]">
       <ToastStack toasts={toasts} onDismiss={dismiss} />
 
       {/* Header / TV status */}
-      <header className="sticky top-0 z-40 border-b border-crimson-500/30 bg-void/90 px-4 pb-3 pt-[max(12px,env(safe-area-inset-top))] backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-graphite-600 bg-void/90 px-4 pb-3 pt-[max(12px,env(safe-area-inset-top))] backdrop-blur">
         <div className="flex items-center justify-between">
-          <h1 className="neon-text font-display text-lg font-black tracking-[0.2em]">BOOTH SCANNER</h1>
+          <h1 className="brand-text font-display text-lg font-extrabold tracking-[0.2em]">BOOTH SCANNER</h1>
           <span className="flex items-center gap-2 font-hud text-xs font-semibold tracking-wide text-graphite-300">
             <span className={`h-2 w-2 animate-pulse-dot rounded-full ${linkDot}`} />
             {realtime === "live" ? "ออนไลน์" : pollOk ? "ซิงก์สำรอง" : "ออฟไลน์"}
@@ -153,7 +153,7 @@ export default function ScannerPage() {
             key={tvLabel}
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`truncate ${row?.current_barcode_id ? "text-crimson-200" : "text-graphite-200"}`}
+            className={`truncate ${row?.current_barcode_id ? "text-crimson-600" : "text-graphite-200"}`}
           >
             {tvLabel}
           </motion.span>
@@ -162,7 +162,7 @@ export default function ScannerPage() {
 
       <div className="mx-auto flex max-w-md flex-col gap-5 px-4 pt-5">
         {/* Viewfinder */}
-        <section className="relative aspect-square w-full overflow-hidden border border-crimson-500/40 bg-black shadow-glow-inset">
+        <section className="relative aspect-square w-full overflow-hidden rounded-3xl bg-black shadow-glow-lg">
           <video ref={videoRef} className="absolute inset-0 h-full w-full object-cover" muted playsInline autoPlay />
 
           {/* Frame overlay */}
@@ -176,12 +176,11 @@ export default function ScannerPage() {
               </div>
             ) : null}
           </div>
-          <div className="pointer-events-none absolute inset-0 bg-scanlines opacity-40" />
 
           {camState !== "scanning" ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-void/85 p-6 text-center">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-sunrise p-6 text-center">
               {camState === "starting" ? (
-                <p className="animate-pulse font-hud text-lg font-semibold tracking-wide text-crimson-200">
+                <p className="animate-pulse font-hud text-lg font-semibold tracking-wide text-crimson-600">
                   กำลังเปิดกล้อง…
                 </p>
               ) : (
@@ -209,13 +208,13 @@ export default function ScannerPage() {
             <button
               type="button"
               onClick={() => setCameraOn(false)}
-              className="absolute bottom-3 right-3 border border-graphite-500 bg-void/70 px-3 py-2 font-hud text-xs font-bold tracking-wide text-graphite-200"
+              className="absolute bottom-3 right-3 rounded-full border border-graphite-500 bg-white/80 px-3 py-2 font-hud text-xs font-bold tracking-wide text-graphite-200"
             >
               หยุดกล้อง
             </button>
           )}
           {sending ? (
-            <div className="absolute left-3 top-3 bg-crimson-500 px-2 py-1 font-hud text-xs font-bold tracking-wide">
+            <div className="absolute left-3 top-3 rounded-full bg-crimson-500 px-3 py-1 text-white font-hud text-xs font-bold tracking-wide">
               กำลังส่ง…
             </div>
           ) : null}
@@ -226,14 +225,14 @@ export default function ScannerPage() {
           {lastSent ? (
             <motion.section
               key={sendCount}
-              className="hud-panel flex items-center gap-4 p-3"
+              className="card-panel flex items-center gap-4 p-3"
               // Spring pop so a confirmed send is felt, not just seen.
               initial={{ opacity: 0, scale: 0.94, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96 }}
               transition={{ type: "spring", stiffness: 380, damping: 26 }}
             >
-              <div className="h-20 w-20 shrink-0 overflow-hidden bg-graphite-800">
+              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-graphite-800">
                 {lastSent.image_url ? (
                   <img src={lastSent.image_url} alt="" className="h-full w-full object-cover" />
                 ) : null}
@@ -243,7 +242,7 @@ export default function ScannerPage() {
                   {row?.current_barcode_id === lastSent.barcode_id ? "● กำลังแสดงบนจอ" : "ส่งแล้ว"}
                 </p>
                 <p className="truncate font-display text-sm font-bold uppercase">{lastSent.title}</p>
-                <p className="neon-text font-display text-xl font-black">{formatBaht(lastSent.price)}</p>
+                <p className="brand-text font-display text-xl font-extrabold">{formatBaht(lastSent.price)}</p>
               </div>
             </motion.section>
           ) : null}
@@ -265,7 +264,7 @@ export default function ScannerPage() {
             spellCheck={false}
             enterKeyHint="send"
             placeholder="เช่น 8850001000019"
-            className="h-14 border border-crimson-500/50 bg-graphite-900 px-4 font-hud text-xl tracking-[0.15em] text-white outline-none placeholder:text-graphite-500 focus:border-scarlet-500 focus:shadow-glow"
+            className="h-14 rounded-2xl border border-graphite-500 bg-white px-4 font-hud text-xl tracking-[0.15em] text-ink outline-none placeholder:text-graphite-500 focus:border-scarlet-500 focus:shadow-glow"
           />
           <button type="submit" className="btn-primary" disabled={!manual.trim() || sending}>
             SEND TO TV
@@ -278,7 +277,7 @@ export default function ScannerPage() {
 
         {/* Quick-pick list — handy for demos and when a label is damaged */}
         {productList.length > 0 ? (
-          <details className="border border-graphite-600 bg-graphite-900/60">
+          <details className="overflow-hidden rounded-2xl border border-graphite-600 bg-white">
             <summary className="cursor-pointer list-none px-4 py-4 font-hud text-sm font-bold tracking-wide text-graphite-200">
               รายการสินค้า ({productList.length}) ▾
             </summary>
@@ -297,7 +296,7 @@ export default function ScannerPage() {
                       <span className="block truncate text-sm font-medium">{p.title}</span>
                       <span className="block font-hud text-xs tracking-[0.15em] text-graphite-400">{p.barcode_id}</span>
                     </span>
-                    <span className="shrink-0 font-display text-sm font-bold text-crimson-200">
+                    <span className="shrink-0 font-display text-sm font-bold text-crimson-600">
                       {formatBaht(p.price)}
                     </span>
                   </button>

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { NOT_FOUND_MS } from "@/lib/config";
+import { SunriseBackdrop } from "./SunriseBackdrop";
 
 interface Props {
   code: string;
@@ -16,52 +17,41 @@ export function NotFoundScreen({ code }: Props) {
       exit={{ opacity: 0, transition: { duration: 0.35 } }}
       transition={{ duration: 0.15 }}
     >
-      <div className="absolute inset-0 bg-hud-grid bg-grid opacity-60" />
-      {/* Hazard stripes top & bottom */}
-      {["top-0", "bottom-0"].map((pos) => (
-        <div
-          key={pos}
-          className={`absolute inset-x-0 ${pos} h-10 opacity-70`}
-          style={{
-            background: "repeating-linear-gradient(-45deg, #DC143C 0 28px, transparent 28px 56px)",
-          }}
-        />
-      ))}
-      <div className="absolute inset-0 bg-red-radial opacity-60" />
-      <div className="absolute inset-0 bg-vignette" />
+      <SunriseBackdrop sunX={960} sunY={760} horizonFromBottom={200} skylineOpacity={0.5} ribbonHeight={170} />
 
-      <div className="relative flex h-full flex-col items-center justify-center gap-10 text-center">
+      <div className="relative flex h-full flex-col items-center justify-center gap-8 pb-24 text-center">
+        {/* Icon pops in with a springy overshoot, then wobbles once — a friendly "hmm?" */}
         <motion.div
-          className="font-hud text-3xl font-semibold tracking-[0.6em] text-scarlet-400"
-          animate={{ opacity: [1, 0.3, 1] }}
-          transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+          className="flex h-36 w-36 items-center justify-center rounded-full border-[6px] border-crimson-500 bg-white shadow-glow-lg"
+          initial={{ scale: 0, rotate: -30 }}
+          animate={{ scale: 1, rotate: [-30, 12, -6, 0] }}
+          transition={{ scale: { type: "spring", stiffness: 380, damping: 18 }, rotate: { duration: 0.6, ease: "easeOut" } }}
         >
-          ⚠ ERROR 404 · NO MATCH
+          <span className="brand-text text-[92px] font-extrabold leading-none">?</span>
         </motion.div>
 
-        {/* Hard "glitch-in": quick horizontal jitter + skew over 350 ms using
-            linear keyframes (glitches should look mechanical, not eased). */}
+        {/* Short horizontal shake (eased, decaying amplitude): a clear "no match"
+            signal that still feels polished rather than glitchy. */}
         <motion.h1
-          className="glitch animate-flicker font-display text-[150px] font-black leading-none tracking-[0.06em] text-white neon-text"
-          data-text="PRODUCT NOT FOUND"
-          initial={{ x: -40, skewX: 20, opacity: 0 }}
-          animate={{ x: [-40, 30, -18, 8, 0], skewX: [20, -14, 8, -3, 0], opacity: [0, 1, 0.6, 1, 1] }}
-          transition={{ duration: 0.35, ease: "linear" }}
+          className="title-shadow text-[128px] font-extrabold leading-none tracking-tight text-ink"
+          initial={{ opacity: 0, x: 0 }}
+          animate={{ opacity: 1, x: [0, -28, 22, -14, 8, 0] }}
+          transition={{ opacity: { duration: 0.15 }, x: { duration: 0.5, ease: "easeOut" } }}
         >
-          PRODUCT NOT FOUND
+          PRODUCT <span className="brand-text">NOT FOUND</span>
         </motion.h1>
 
-        <div className="hud-panel px-12 py-6">
-          <span className="font-hud text-2xl font-semibold tracking-[0.4em] text-graphite-300">
-            SCANNED CODE: <span className="text-crimson-200">{code || "—"}</span>
+        <div className="card-panel rounded-full px-10 py-4">
+          <span className="text-2xl font-semibold tracking-[0.25em] text-graphite-300">
+            SCANNED CODE: <span className="text-crimson-600">{code || "—"}</span>
           </span>
         </div>
 
-        <p className="font-sans text-3xl font-light text-graphite-200">ไม่พบสินค้านี้ในระบบ กรุณาสแกนใหม่อีกครั้ง</p>
+        <p className="text-[34px] font-medium text-ink-soft">ไม่พบสินค้านี้ในระบบ กรุณาสแกนใหม่อีกครั้ง</p>
 
-        <div className="mt-6 h-2 w-[640px] overflow-hidden bg-crimson-900/60">
+        <div className="mt-4 h-2.5 w-[640px] overflow-hidden rounded-full bg-crimson-100">
           <motion.div
-            className="h-full origin-left bg-scarlet-500 shadow-glow"
+            className="h-full origin-left rounded-full bg-ribbon-red"
             initial={{ scaleX: 1 }}
             animate={{ scaleX: 0 }}
             transition={{ duration: NOT_FOUND_MS / 1000, ease: "linear" }}

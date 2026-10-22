@@ -31,7 +31,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 }
 
 const inputClass =
-  "h-12 w-full border border-graphite-500 bg-graphite-800 px-3 text-base text-white outline-none placeholder:text-graphite-500 focus:border-scarlet-500 focus:shadow-glow-sm";
+  "h-12 w-full rounded-xl border border-graphite-500 bg-white px-3 text-base text-ink outline-none placeholder:text-graphite-500 focus:border-scarlet-500 focus:shadow-glow-sm";
 
 function describeError(err: unknown): string {
   const e = err as { code?: string; message?: string; statusCode?: string };
@@ -160,7 +160,7 @@ export function ProductEditor({ product, initialBarcode = "", onClose, onSaved }
                 <button
                   type="button"
                   onClick={() => setScanOpen(true)}
-                  className="h-12 shrink-0 border border-crimson-500/60 px-4 text-sm font-medium text-crimson-200 hover:bg-crimson-500/15"
+                  className="h-12 shrink-0 rounded-xl border border-crimson-500/60 px-4 text-sm font-medium text-crimson-600 hover:bg-crimson-500/15"
                 >
                   📷 กล้อง
                 </button>
@@ -187,7 +187,7 @@ export function ProductEditor({ product, initialBarcode = "", onClose, onSaved }
             <Field label="วิดีโอพื้นหลัง (ไม่บังคับ)" hint={`MP4/WebM ไม่เกิน ${MAX_VIDEO_MB} MB เล่นแบบปิดเสียงวนซ้ำหลังสินค้า`}>
               <div className="flex gap-2">
                 <input className={inputClass} value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="วางลิงก์ หรือกดอัปโหลด" />
-                <label className="flex h-12 shrink-0 cursor-pointer items-center border border-crimson-500/60 px-4 text-sm font-medium text-crimson-200 hover:bg-crimson-500/15">
+                <label className="flex h-12 shrink-0 cursor-pointer items-center rounded-xl border border-crimson-500/60 px-4 text-sm font-medium text-crimson-600 hover:bg-crimson-500/15">
                   {uploading === "video" ? "กำลังอัปโหลด…" : "อัปโหลด"}
                   <input type="file" accept="video/mp4,video/webm" className="hidden" disabled={busy} onChange={(e) => void handleVideo(e.target.files?.[0])} />
                 </label>
@@ -198,14 +198,14 @@ export function ProductEditor({ product, initialBarcode = "", onClose, onSaved }
           {/* Image column */}
           <div className="grid content-start gap-3">
             <span className="text-sm font-medium text-graphite-200">รูปสินค้า</span>
-            <label className="group relative flex aspect-square cursor-pointer items-center justify-center overflow-hidden border border-dashed border-crimson-500/60 bg-graphite-800 hover:border-scarlet-500">
+            <label className="group relative flex aspect-square cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-crimson-500/60 bg-graphite-800 hover:border-scarlet-500">
               {imageUrl ? (
                 <img src={imageUrl} alt="" className="h-full w-full object-cover" />
               ) : (
                 <span className="px-4 text-center text-sm text-graphite-300">แตะเพื่อเลือกรูป หรือถ่ายรูป</span>
               )}
               {uploading === "image" ? (
-                <span className="absolute inset-0 flex items-center justify-center bg-void/80 text-sm text-crimson-200">กำลังอัปโหลด…</span>
+                <span className="absolute inset-0 flex items-center justify-center bg-void/80 text-sm text-crimson-600">กำลังอัปโหลด…</span>
               ) : imageUrl ? (
                 <span className="absolute inset-x-0 bottom-0 bg-void/80 py-1.5 text-center text-xs text-graphite-200 opacity-0 transition group-hover:opacity-100">
                   เปลี่ยนรูป

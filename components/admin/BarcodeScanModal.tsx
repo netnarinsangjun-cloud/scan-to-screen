@@ -24,7 +24,7 @@ export function BarcodeScanModal({ onResult, onClose }: Props) {
 
   return (
     <Modal title="สแกนบาร์โค้ดด้วยกล้อง" onClose={onClose}>
-      <div className="relative aspect-square w-full overflow-hidden border border-crimson-500/40 bg-black">
+      <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-black">
         <video ref={videoRef} className="absolute inset-0 h-full w-full object-cover" muted playsInline autoPlay />
         <div className="pointer-events-none absolute inset-[14%]">
           <div className="hud-corners absolute inset-0" />
@@ -35,8 +35,8 @@ export function BarcodeScanModal({ onResult, onClose }: Props) {
           ) : null}
         </div>
         {state !== "scanning" ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-void/80 p-6 text-center text-sm">
-            {error ? <p className="text-scarlet-400">{error}</p> : <p className="animate-pulse text-crimson-200">กำลังเปิดกล้อง…</p>}
+          <div className="absolute inset-0 flex items-center justify-center bg-sunrise p-6 text-center text-sm">
+            {error ? <p className="text-scarlet-400">{error}</p> : <p className="animate-pulse text-crimson-600">กำลังเปิดกล้อง…</p>}
           </div>
         ) : null}
       </div>

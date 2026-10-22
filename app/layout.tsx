@@ -1,25 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans_Thai, Orbitron, Rajdhani } from "next/font/google";
+import { Noto_Sans_Thai } from "next/font/google";
 import "./globals.css";
 
-const display = Orbitron({
-  subsets: ["latin"],
-  weight: ["500", "700", "800", "900"],
-  variable: "--font-display",
-  display: "swap",
-});
-
-const hud = Rajdhani({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  variable: "--font-hud",
-  display: "swap",
-});
-
-// Body font covers both Latin and Thai so product descriptions render cleanly.
-const body = IBM_Plex_Sans_Thai({
+// One family for headings, labels and body: covers Latin and Thai with the same
+// clean humanist shapes as the reference artwork.
+const body = Noto_Sans_Thai({
   subsets: ["latin", "thai"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["300", "400", "500", "600", "700", "800"],
   variable: "--font-body",
   display: "swap",
 });
@@ -31,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050505",
+  themeColor: "#FFFDFB",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -41,11 +28,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="th" className={`${display.variable} ${hud.variable} ${body.variable}`}>
-      <body className="font-sans">
-        {children}
-        <div className="hud-overlay" aria-hidden />
-      </body>
+    <html lang="th" className={body.variable}>
+      <body className="font-sans">{children}</body>
     </html>
   );
 }
