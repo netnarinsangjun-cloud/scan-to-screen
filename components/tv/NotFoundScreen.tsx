@@ -17,7 +17,7 @@ export function NotFoundScreen({ code }: Props) {
       exit={{ opacity: 0, transition: { duration: 0.35 } }}
       transition={{ duration: 0.15 }}
     >
-      <SunriseBackdrop sunX={960} sunY={760} horizonFromBottom={200} skylineOpacity={0.5} ribbonHeight={170} />
+      <SunriseBackdrop sunX={960} sunY={560} ribbonHeight={170} />
 
       <div className="relative flex h-full flex-col items-center justify-center gap-8 pb-24 text-center">
         {/* Icon pops in with a springy overshoot, then wobbles once — a friendly "hmm?" */}

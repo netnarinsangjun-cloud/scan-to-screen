@@ -121,7 +121,7 @@ export function ProductScreen({ product, deadline, durationMs, rescanCount }: Pr
       animate="animate"
       exit="exit"
     >
-      <SunriseBackdrop sunX={560} sunY={520} horizonFromBottom={150} skylineOpacity={0.55} ribbonHeight={150} />
+      <SunriseBackdrop sunX={560} sunY={520} ribbonHeight={150} />
 
       {product.video_url ? (
         <>

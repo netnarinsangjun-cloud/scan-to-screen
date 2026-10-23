@@ -29,8 +29,6 @@ export const CATALOG_CHANGED_EVENT = "catalog_changed";
 export const CANVAS_WIDTH = 1920;
 export const CANVAS_HEIGHT = 1080;
 
-export const BOOTH_LABEL = "SCAN//TO//SCREEN";
-
 /**
  * Admins sign in with a username + password. Supabase Auth needs an email, so a
  * bare username maps to `<username>@scan-to-screen.local` (never emailed).
