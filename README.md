@@ -64,29 +64,25 @@ insert into public.admins (email) values ('staff2@scan-to-screen.local');
 
 ## 4. เปิด `/tv` แบบเต็มจอ (Kiosk)
 
-ใช้ Chrome หรือ Edge บนคอมพิวเตอร์ที่ต่อกับทีวี ตั้งความละเอียดจอเป็น 1920×1080 ที่สเกล 100% ถ้าจอมีขนาดอื่น หน้าจอก็จะย่อขยายให้พอดีเอง
+ใช้ Google Chrome บนคอมพิวเตอร์ที่ต่อกับทีวี ตั้งความละเอียดจอเป็น 1920×1080 ที่สเกล 100% ถ้าจอมีขนาดอื่น หน้าจอก็จะย่อขยายให้พอดีเอง
 
-**Windows**
+**วิธีง่ายที่สุด: ดับเบิลคลิกไฟล์ในโฟลเดอร์ [`kiosk/`](kiosk/)**
 
-```bat
-"C:\Program Files\Google\Chrome\Application\chrome.exe" --kiosk --noerrdialogs --disable-infobars --disable-session-crashed-bubble --autoplay-policy=no-user-gesture-required --app=https://YOUR-APP.vercel.app/tv
-```
+| เครื่อง | ไฟล์ | ออกจากโหมด Kiosk |
+| --- | --- | --- |
+| Mac | `kiosk/start-tv-mac.command` | กด Cmd + Q |
+| Windows | `kiosk/start-tv-windows.bat` | กด Alt + F4 |
 
-**macOS**
+ไฟล์นี้จะเปิด Chrome แบบ **Kiosk** คือเต็มจอแบบล็อก ไม่มีแถบที่อยู่และไม่มีแท็บ กด Esc หรือ F11 แล้วไม่หลุดออกจากเต็มจอ ไฟล์ใช้โปรไฟล์ Chrome แยกต่างหาก จึงเปิดได้แม้ Chrome ปกติเปิดอยู่ และไม่มีแท็บหรือบัญชีส่วนตัวโผล่บนจอทีวี
 
-```bash
-open -a "Google Chrome" --args --kiosk --noerrdialogs --autoplay-policy=no-user-gesture-required --app=https://YOUR-APP.vercel.app/tv
-```
+- **Mac:** ครั้งแรกถ้าขึ้นว่าเปิดไม่ได้ ให้คลิกขวาที่ไฟล์ แล้วเลือก **Open** ไฟล์นี้กันไม่ให้ Mac หลับระหว่างเปิดจอให้ด้วย
+- **Windows:** ถ้าอยากให้เปิดเองทุกครั้งที่เปิดเครื่อง กด Win+R พิมพ์ `shell:startup` แล้ววาง shortcut ของไฟล์ `.bat` ไว้ในโฟลเดอร์นั้น
 
-**Linux**
-
-```bash
-google-chrome --kiosk --noerrdialogs --disable-infobars --autoplay-policy=no-user-gesture-required --app=https://YOUR-APP.vercel.app/tv
-```
+ถ้าเปิด `/tv` ใน Chrome ธรรมดา (ไม่ใช่ Kiosk) ให้คลิกที่จอ 1 ครั้งเพื่อเข้าเต็มจอ ถ้ามีคนกด Esc หลุดออกมา การยิงบาร์โค้ดครั้งต่อไปจะพากลับเข้าเต็มจอให้เอง
 
 ข้อควรรู้สำหรับโหมด Kiosk:
 
-- เคอร์เซอร์เมาส์และแถบเลื่อนถูกซ่อนไว้ ถ้าไม่ได้เปิดแบบ Kiosk ให้คลิกหนึ่งครั้งที่ใดก็ได้บนจอเพื่อเข้าโหมดเต็มจอ หรือกด F11
+- เคอร์เซอร์เมาส์และแถบเลื่อนถูกซ่อนไว้
 - **หน้าต่าง `/tv` ต้องเป็นหน้าต่างที่ active อยู่** เครื่องสแกน USB จึงจะใช้งานได้ หลังเปิดให้คลิกที่หน้าจอหนึ่งครั้ง และอย่าเปิดหน้าต่างอื่นบนเครื่องนั้น
 - หน้านี้ขอ Screen Wake Lock เพื่อไม่ให้จอดับ แต่ควรปิดโหมดพักเครื่องและภาพพักหน้าจอของระบบปฏิบัติการด้วย
 - รูปสินค้าจะถูกโหลดล่วงหน้าตั้งแต่เปิดหน้า และรายการสินค้าจะรีเฟรชทุก 60 วินาที สินค้าที่เพิ่มระหว่างงานจึงแสดงได้โดยไม่ต้องรีโหลดหน้า

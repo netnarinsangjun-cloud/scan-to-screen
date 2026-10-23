@@ -227,12 +227,20 @@ export default function TvPage() {
         document.documentElement.requestFullscreen?.().catch(() => undefined);
       }
     };
+    // Browsers only allow fullscreen from a user gesture. A key press counts, so
+    // if someone pressed Esc, the next barcode scan puts the TV back in fullscreen.
+    // (Escape itself is excluded: it is what exits fullscreen.)
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") goFullscreen();
+    };
     window.addEventListener("contextmenu", blockMenu);
     window.addEventListener("pointerdown", goFullscreen);
+    window.addEventListener("keydown", onKey);
     window.focus();
     return () => {
       window.removeEventListener("contextmenu", blockMenu);
       window.removeEventListener("pointerdown", goFullscreen);
+      window.removeEventListener("keydown", onKey);
     };
   }, []);
 
